@@ -1,33 +1,56 @@
 const BMIData = [
-  { name: "Maigreur", color: "midnightblue", range: [0, 18.5] },
-  { name: "Bonne santé", color: "green", range: [18.5, 25] },
-  { name: "Surpoids", color: "lightcoral", range: [25, 30] },
-  { name: "Obésité modérée", color: "orange", range: [30, 35] },
-  { name: "Obésité sévère", color: "crimson", range: [35, 40] },
-  { name: "Obésité morbide", color: "purple", range: 40 },
+  { description: "Maigreur", color: "midnightblue", range: [0, 18.5] },
+  { description: "Bonne santé", color: "green", range: [18.5, 25] },
+  { description: "Surpoids", color: "lightcoral", range: [25, 30] },
+  { description: "Obésité modérée", color: "orange", range: [30, 35] },
+  { description: "Obésité sévère", color: "crimson", range: [35, 40] },
+  { description: "Obésité morbide", color: "purple", range: 40 },
 ];
 
 // IMC = poids en kg / taille² en m
-// const weight=document.querySelector('#weight');
-// const height = document.querySelector('#height');
+const form = document.querySelector('form');
+const displayBMI = document.querySelector('.bmi-value');
+const result = document.querySelector('.result');
 
+form.addEventListener("submit", handleForm);
 
+function handleForm(e) {
+  e.preventDefault();
 
-const form = document.querySelector('form')
+  const inputs = document.querySelectorAll('input');
+  const height = inputs[0].value;
+  const weight = inputs[1].value;
 
-form.addEventListener('submit', onFormSubmit)
+  // validation du formulaire
+  // falsy : 0 null undefined ''
+  if (!height || !weight || height <= 0 || weight <= 0) {
+    handleError()
+    return
+  }
 
-function onFormSubmit(e){
-e.preventDefault();
-const inputs = document.querySelectorAll('input');
-const weight = inputs [1]
-const height = inputs [0]
-
-console.log(height.value, weight.value)
+  const BMI = (weight / (height / 100) ** 2).toFixed(1);
+  console.log(BMI);
+  showResult(BMI)
 }
 
+function handleError() {
+  displayBMI.textContent = 'Echec'
+  result.textContent = 'Remplissez correctement le formulaire'
+}
 
-
-console.log(height.value, weight.value)
-
-
+function showResult(BMI) {
+  let rank;
+  for (let i = 0; i < BMIData.length; i++) {
+    const data = BMIData[i];
+    if (BMI > data.range[0] && BMI <= data.range[1]) {
+      rank = data;
+      break;
+    } else if (typeof data.range === 'number' && data.range >= 40) {
+      rank = data;
+      break;
+    }
+  }
+  displayBMI.textContent = BMI;
+  displayBMI.style.color = rank.color;
+  result.textContent = rank.description
+}
